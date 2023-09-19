@@ -32,10 +32,13 @@ export const useInventoryStore = defineStore('inventory', () => {
   })
 
   const openCreateCell = (row, col) => {
+    if (count.value <= 0) {
+      return
+    }
     board.value[row][col].push({
       id: Math.floor(Math.random() * 10000),
       count: count.value,
-      backgroundColor: getRandomColor()
+      backgroundColor: getRandomColor(),
     })
     localStorage.setItem('board', JSON.stringify(board.value))
   }
@@ -66,8 +69,14 @@ export const useInventoryStore = defineStore('inventory', () => {
     localStorage.setItem('board', JSON.stringify(board.value))
   }
   const deleteCall = () => {
-    board.value[saveRowIndex.value][saveColIndex.value].pop()
-    localStorage.setItem('board', JSON.stringify(board.value))
+    const count = board.value[saveRowIndex.value][saveColIndex.value]
+    if (count[0].count === 1) {
+      board.value[saveRowIndex.value][saveColIndex.value].pop()
+      localStorage.setItem('board', JSON.stringify(board.value))
+    } else {
+      count[0].count--
+      localStorage.setItem('board', JSON.stringify(board.value))
+    }
   }
 
   return {
@@ -83,6 +92,7 @@ export const useInventoryStore = defineStore('inventory', () => {
     handleDragStart,
     handleDragOver,
     handleDrop,
-    deleteCall
+    deleteCall,
+    getRandomColor
   }
 })

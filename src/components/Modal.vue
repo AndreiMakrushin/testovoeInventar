@@ -1,5 +1,5 @@
 <script setup>
-import { computed, reactive } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useInventoryStore } from '../stores/inventory'
 
 const states = reactive(useInventoryStore())
@@ -8,18 +8,18 @@ const states = reactive(useInventoryStore())
 const text = computed(() => {
   return states.isNotNullCell ? 'Удалить ячейку' : 'Создать ячейку'
 })
+const errorPush = ref(false)
 </script>
 <template>
   <div>
     <div class="create-cell" v-if="states.openModel">
       <h1>{{text}}</h1>
       <h3 v-if="!states.isNotNullCell">Введите колисчество</h3>
+      <h2 class="red" v-if="errorPush">Значение поля должно быть больше нуля</h2>
       <input class="modal-input" type="number" v-model="states.count" v-if="!states.isNotNullCell" />
       <button
         @click="
-          states.openCreateCell(states.saveRowIndex, states.saveColIndex),
-            (states.openModel = false),
-            (states.count = 0)
+        states.count <= 0 ? (errorPush = true) : (states.openCreateCell(states.saveRowIndex, states.saveColIndex), (states.openModel = false), (states.count = 0), (errorPush = false))
         "
         v-if="!states.isNotNullCell"
         class="btn-create"
@@ -39,6 +39,11 @@ const text = computed(() => {
 </template>
 
 <style scoped>
+
+.red{
+  color: red;
+  font-size: 30px;
+}
 .create-cell {
   padding: 30px;
   background-color: #262626;
